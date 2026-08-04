@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧校园 · 一卡通 / 消费</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--panel2:#1c2230;--line:#2a3140;--txt:#e6edf3;--dim:#8b949e;--dim2:#6e7681;--accent:#4f8cff;--accent2:#22c55e;--warn:#f59e0b;--danger:#ef4444;--purple:#a78bfa;--radius:10px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);font-size:13px;line-height:1.5;display:flex;height:100vh;overflow:hidden}
+  .sidebar{width:212px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:9px;padding:16px 16px 14px;border-bottom:1px solid var(--line)}
+  .logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff}
+  .logo b{font-size:15px;letter-spacing:.5px}.logo span{display:block;font-size:10px;color:var(--dim);font-weight:400}
+  .nav{flex:1;overflow-y:auto;padding:8px 0}
+  .nav .grp{font-size:10px;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;padding:12px 18px 5px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:8px 18px;color:var(--dim);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:.15s}
+  .nav a:hover{background:var(--panel2);color:var(--txt)}
+  .nav a.active{background:linear-gradient(90deg,rgba(79,140,255,.15),transparent);color:var(--txt);border-left-color:var(--accent)}
+  .nav a .ic{width:16px;text-align:center;font-size:14px;opacity:.9}
+  .nav a .badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600}
+  .side-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px}
+  .side-foot .av{width:28px;height:28px;border-radius:50%;background:var(--accent2);color:#04210f;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .side-foot small{display:block;color:var(--dim);font-size:11px}
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .crumb{color:var(--dim);font-size:12px}.crumb a{color:var(--dim);text-decoration:none}.crumb a:hover{color:var(--accent)}.crumb b{color:var(--txt)}
+  .search{flex:1;max-width:360px;margin-left:8px;position:relative}
+  .search input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--txt);padding:7px 12px 7px 32px;border-radius:8px;font-size:12px;outline:none}
+  .search input:focus{border-color:var(--accent)}
+  .search::before{content:"🔍";position:absolute;left:10px;top:7px;font-size:12px;opacity:.6}
+  .top-ico{width:32px;height:32px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+  .top-ico .dot{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+  .top-ico.u{background:var(--accent);border:none;color:#fff;font-weight:700}
+  .content{flex:1;overflow-y:auto;padding:18px 20px 40px}
+  .page-h{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+  .page-h h1{font-size:19px;font-weight:650}.page-h p{color:var(--dim);font-size:12px;margin-top:3px}
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600}
+  .btn.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar select{background:var(--bg);border:1px solid var(--line);color:var(--txt);padding:7px 11px;border-radius:8px;font-size:12px;outline:none}
+  .toolbar select:focus{border-color:var(--accent)}
+  .toolbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--dim);font-size:12px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px}
+  .kpi .lab{color:var(--dim);font-size:11px}.kpi .val{font-size:22px;font-weight:700;margin-top:6px}.kpi .sub{font-size:11px;margin-top:4px;color:var(--dim)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px;background:var(--panel2)}
+  tbody tr{cursor:pointer}tbody tr:hover{background:var(--panel2)}
+  .av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px;vertical-align:middle;color:#fff}
+  .st{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:600}
+  .st.ok{background:rgba(34,197,94,.15);color:var(--accent2)}
+  .st.bad{background:rgba(239,68,68,.15);color:var(--danger)}
+  .op{color:var(--accent);font-size:12px;margin-right:10px;text-decoration:none}.op:hover{text-decoration:underline}
+  .pager{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font-size:12px;color:var(--dim)}
+  .pager .pg{display:flex;gap:6px}.pager .pg button{background:var(--bg);border:1px solid var(--line);color:var(--txt);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:12px}
+  .pager .pg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.2s;z-index:20}
+  .mask.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:420px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:.25s;z-index:21;display:flex;flex-direction:column}
+  .drawer.show{transform:translateX(0)}
+  .dh{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .dh .av{width:46px;height:46px;font-size:17px}.dh .x{margin-left:auto;background:var(--bg);border:1px solid var(--line);color:var(--dim);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
+  .dh b{font-size:15px}.dh small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+  .tabs{display:flex;border-bottom:1px solid var(--line);padding:0 10px}
+  .tabs button{background:none;border:none;color:var(--dim);padding:11px 12px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent}
+  .tabs button.on{color:var(--txt);border-bottom-color:var(--accent)}
+  .dbody{flex:1;overflow-y:auto;padding:16px 18px}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .kv span{color:var(--dim)}.kv b{font-weight:600}
+  .dsec{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px}
+  .bars{display:flex;flex-direction:column;gap:10px}.bars .row{font-size:12px}.bars .row .top{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:4px}.bars .row .top b{color:var(--txt)}
+  .progress{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden}.progress i{display:block;height:100%;border-radius:4px}
+  .witem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.witem .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}.witem .t small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+  .empty{color:var(--dim);text-align:center;padding:30px;font-size:12px}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo"><div class="mark">智</div><div><b>智慧校园</b><span>Campus OS · v3.2</span></div></div>
+  <nav class="nav">
+    <div class="grp">主控制台</div>
+    <a href="index.html"><span class="ic">📊</span>数据总览</a>
+    <a href="#"><span class="ic">✅</span>今日待办 <span class="badge">12</span></a>
+    <div class="grp">业务管理</div>
+    <a href="students.html"><span class="ic">🎓</span>学生管理</a>
+    <a href="academic.html"><span class="ic">📚</span>教务管理</a>
+    <a href="dorm.html"><span class="ic">🏠</span>宿舍管理</a>
+    <a class="active" href="card.html"><span class="ic">💳</span>一卡通 / 消费</a>
+    <a href="finance.html"><span class="ic">💰</span>财务缴费</a>
+    <a href="#"><span class="ic">⚙️</span>资产设备</a>
+    <div class="grp">协同</div>
+    <a href="#"><span class="ic">📢</span>通知公告 <span class="badge">3</span></a>
+    <a href="#"><span class="ic">🛡️</span>安全预警</a>
+    <a href="#"><span class="ic">⚙</span>系统设置</a>
+  </nav>
+  <div class="side-foot"><div class="av">王</div><div><b>王管理员</b><small>信息化办公室</small></div></div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="index.html">主控制台</a> / <b>一卡通 / 消费</b></div>
+    <div class="search"><input placeholder="搜索学号 / 姓名…"></div>
+    <div class="top-ico">🔔<span class="dot"></span></div><div class="top-ico">✉️</div><div class="top-ico u">王</div>
+  </div>
+  <div class="content">
+    <div class="page-h"><div><h1>一卡通 / 消费</h1><p>本周交易 18.6 万笔 · 点击行查看消费明细</p></div><button class="btn">异常核查</button></div>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">💳 本周交易额</div><div class="val">¥3.84M</div><div class="sub">▲ 6.1%</div></div>
+      <div class="kpi"><div class="lab">📈 笔均消费</div><div class="val">¥20.6</div><div class="sub">18.6 万笔</div></div>
+      <div class="kpi"><div class="lab">⚠️ 异常交易</div><div class="val">9</div><div class="sub">待核查</div></div>
+      <div class="kpi"><div class="lab">🍜 餐饮占比</div><div class="val">58%</div><div class="sub">最大场景</div></div>
+    </div>
+    <div class="toolbar">
+      <select id="f-scene"><option value="">全部场景</option><option>餐饮</option><option>超市</option><option>图书</option><option>体育</option></select>
+      <select id="f-flag"><option value="">全部</option><option value="bad">仅异常</option><option value="ok">正常</option></select>
+      <div class="sp"><span id="count">—</span><button class="btn ghost" id="reset">重置</button></div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>学号</th><th>姓名</th><th>院系</th><th>本月消费</th><th>笔数</th><th>主要场景</th><th>标记</th><th>操作</th></tr></thead><tbody id="tbody"></tbody></table>
+      <div class="pager"><span id="pinfo">—</span><div class="pg" id="pg"></div></div>
+    </div>
+  </div>
+</main>
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <div class="dh"><div class="av" id="d-av">?</div><div><b id="d-name">—</b><small id="d-id">—</small></div><button class="x" id="d-x">✕</button></div>
+  <div class="tabs"><button class="on" data-t="tx">交易记录</button><button data-t="scene">场景占比</button><button data-t="flag">异常核查</button></div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+<script>
+const DEPTS=['计算机学院','经济管理学院','机械工程','外国语学院','医学院','艺术设计'];
+const NAMES=['李思源','张宇','王梓涵','陈墨','赵欣','刘洋','孙悦','周航','吴桐','郑昊'];
+function rng(s){return()=>{s=(s*9301+49297)%233280;return s/233280;}}
+const r=rng(53);
+let cards=[];
+for(let i=0;i<40;i++){
+  const consume=Math.round(180+r()*1900);
+  const cnt=Math.round(consume/20);
+  const scene=['餐饮','餐饮','超市','图书','体育'][Math.floor(r()*5)];
+  const bad=r()>0.88;
+  cards.push({id:'2025'+(1000+i),name:NAMES[i%NAMES.length],dept:DEPTS[Math.floor(r()*DEPTS.length)],
+    consume,cnt,scene,flag:bad,flagT:bad?'异常':'正常',
+    last:['今天 12:03','今天 07:55','昨天 18:20','昨天 11:40'][Math.floor(r()*4)]});
+}
+const AV=['#4f8cff','#a78bfa','#22c55e','#f59e0b','#ef4444','#06b6d4'];
+const tbody=document.getElementById('tbody');
+let page=1,pageSize=10,cur=[];
+function filt(){const k=document.querySelector('.search input').value.trim().toLowerCase();const sc=document.getElementById('f-scene').value;const f=document.getElementById('f-flag').value;
+  return cards.filter(x=>(!sc||x.scene===sc)&&(!f||(f==='bad'?x.flag:x.flag===false))&&(!k||x.name.toLowerCase().includes(k)||x.id.includes(k)));}
+function render(){cur=filt();const total=cur.length,pages=Math.max(1,Math.ceil(total/pageSize));if(page>pages)page=pages;
+  const sl=cur.slice((page-1)*pageSize,page*pageSize);
+  tbody.innerHTML=sl.map(x=>`<tr data-id="${x.id}"><td style="color:var(--dim)">${x.id}</td><td><span class="av" style="background:${AV[x.dept.length%AV.length]}">${x.name[0]}</span>${x.name}</td><td>${x.dept}</td><td><b>¥${x.consume}</b></td><td style="color:var(--dim)">${x.cnt}</td><td>${x.scene}</td><td><span class="st ${x.flag?'bad':'ok'}">${x.flagT}</span></td><td><a class="op" onclick="event.stopPropagation();openDrawer('${x.id}')">查看</a></td></tr>`).join('')||'<tr><td colspan="8" class="empty">无匹配记录</td></tr>';
+  document.getElementById('count').textContent='共 '+total+' 人';document.getElementById('pinfo').textContent='第 '+((page-1)*pageSize+1)+'-'+Math.min(page*pageSize,total)+' / '+total+' 人';
+  const pg=document.getElementById('pg');pg.innerHTML='';for(let i=1;i<=pages;i++){const b=document.createElement('button');b.textContent=i;b.className=i===page?'on':'';b.onclick=()=>{page=i;render();};pg.appendChild(b);}}
+['f-scene','f-flag'].forEach(id=>document.getElementById(id).onchange=()=>{page=1;render();});
+document.querySelector('.search input').oninput=()=>{page=1;render();};
+document.getElementById('reset').onclick=()=>{document.getElementById('f-scene').value='';document.getElementById('f-flag').value='';document.querySelector('.search input').value='';page=1;render();};
+const mask=document.getElementById('mask'),drawer=document.getElementById('drawer');
+function openDrawer(id){const x=cards.find(s=>s.id===id);if(!x)return;document.getElementById('d-av').textContent=x.name[0];document.getElementById('d-av').style.background=AV[x.dept.length%AV.length];document.getElementById('d-name').textContent=x.name;document.getElementById('d-id').textContent=x.id+' · '+x.dept+' · 本月 ¥'+x.consume;drawer.dataset.id=id;showTab('tx');mask.classList.add('show');drawer.classList.add('show');}
+function close(){mask.classList.remove('show');drawer.classList.remove('show');}
+document.getElementById('d-x').onclick=close;mask.onclick=close;
+const tabs=document.querySelectorAll('.tabs button');tabs.forEach(t=>t.onclick=()=>{tabs.forEach(z=>z.classList.remove('on'));t.classList.add('on');showTab(t.dataset.t);});
+const SC=['餐饮','超市','图书','体育','其他'];
+function showTab(t){const x=cards.find(s=>s.id===drawer.dataset.id);const db=document.getElementById('dbody');
+  if(t==='tx'){db.innerHTML='<div class="dsec">最近 6 笔交易</div>'+Array.from({length:6}).map((_,i)=>{const amt=Math.round(5+r()*60);const s=SC[Math.floor(r()*SC.length)];return `<div class="kv"><span>${s} · ${['今天','今天','昨天','前天'][i%4]} ${String(7+i).padStart(2,'0')}:${String((i*13)%60).padStart(2,'0')}</span><b style="color:var(--accent)">-¥${amt}</b></div>`;}).join('');}
+  else if(t==='scene'){const a=58,b=21,c=11,d=7,e=3;db.innerHTML='<div class="dsec">本月场景占比</div><div class="bars">'+[['🍜 餐饮',a,'var(--accent)'],['🛒 超市',b,'var(--purple)'],['📖 图书',c,'var(--accent2)'],['🏊 体育',d,'var(--warn)'],['其他',e,'var(--danger)']].map(r=>`<div class="row"><div class="top"><span>${r[0]}</span><b>¥${Math.round(x.consume*r[1]/100)}</b></div><div class="progress"><i style="width:${r[1]}%;background:${r[2]}"></i></div></div>`).join('')+'</div>';}
+  else{db.innerHTML=x.flag?('<div class="witem"><div class="dot" style="background:var(--danger)"></div><div class="t">单笔大额消费 ¥'+Math.round(1800+r()*1200)+'<small>中心食堂 · 与历史均值偏离 420%</small></div></div><div class="kv" style="margin-top:10px"><span>处置建议</span><b style="color:var(--warn)">联系本人核实</b></div>'):'<div class="empty">✅ 无异常交易</div>';}
+}
+tbody.onclick=e=>{const tr=e.target.closest('tr[data-id]');if(tr)openDrawer(tr.dataset.id);};
+render();
+</script>
+</body>
+</html>
