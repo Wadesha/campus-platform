@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧校园 · 管理平台</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --line:#2a3140;
+    --txt:#e6edf3; --dim:#8b949e; --dim2:#6e7681;
+    --accent:#4f8cff; --accent2:#22c55e; --warn:#f59e0b; --danger:#ef4444; --purple:#a78bfa;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);font-size:13px;line-height:1.5;display:flex;height:100vh;overflow:hidden}
+
+  /* ===== Sidebar ===== */
+  .sidebar{width:212px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:9px;padding:16px 16px 14px;border-bottom:1px solid var(--line)}
+  .logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff}
+  .logo b{font-size:15px;letter-spacing:.5px}
+  .logo span{display:block;font-size:10px;color:var(--dim);font-weight:400}
+  .nav{flex:1;overflow-y:auto;padding:8px 0}
+  .nav .grp{font-size:10px;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;padding:12px 18px 5px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:8px 18px;color:var(--dim);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:.15s}
+  .nav a:hover{background:var(--panel2);color:var(--txt)}
+  .nav a.active{background:linear-gradient(90deg,rgba(79,140,255,.15),transparent);color:var(--txt);border-left-color:var(--accent)}
+  .nav a .ic{width:16px;text-align:center;font-size:14px;opacity:.9}
+  .nav a .badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600}
+  .side-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px}
+  .side-foot .av{width:28px;height:28px;border-radius:50%;background:var(--accent2);color:#04210f;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .side-foot small{display:block;color:var(--dim);font-size:11px}
+
+  /* ===== Main ===== */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{height:54px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .crumb{color:var(--dim);font-size:12px}
+  .crumb b{color:var(--txt)}
+  .search{flex:1;max-width:360px;margin-left:8px;position:relative}
+  .search input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--txt);padding:7px 12px 7px 32px;border-radius:8px;font-size:12px;outline:none}
+  .search input:focus{border-color:var(--accent)}
+  .search::before{content:"🔍";position:absolute;left:10px;top:7px;font-size:12px;opacity:.6}
+  .top-ico{width:32px;height:32px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+  .top-ico .dot{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+  .top-ico.u{background:var(--accent);border:none;color:#fff;font-weight:700}
+
+  .content{flex:1;overflow-y:auto;padding:18px 20px 40px}
+  .page-h{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+  .page-h h1{font-size:19px;font-weight:650}
+  .page-h p{color:var(--dim);font-size:12px;margin-top:3px}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{background:none;border:none;color:var(--dim);padding:6px 13px;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px}
+  .kpi .lab{color:var(--dim);font-size:11px;display:flex;align-items:center;gap:6px}
+  .kpi .val{font-size:23px;font-weight:700;margin-top:6px;letter-spacing:.5px}
+  .kpi .sub{font-size:11px;margin-top:4px}
+  .up{color:var(--accent2)} .down{color:var(--danger)}
+
+  /* Grid */
+  .grid{display:grid;gap:14px}
+  .g-2{grid-template-columns:1.6fr 1fr}
+  .g-3{grid-template-columns:repeat(3,1fr);margin-top:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+  .card h3{font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .card h3 .more{color:var(--dim);font-size:11px;cursor:pointer;font-weight:400}
+  .card h3 .tag{font-size:10px;padding:1px 7px;border-radius:6px;background:var(--panel2);color:var(--dim);font-weight:400}
+
+  /* charts */
+  .chart{width:100%;height:170px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--dim)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  tbody tr:hover{background:var(--panel2)}
+  .st{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .st.ok{background:rgba(34,197,94,.15);color:var(--accent2)}
+  .st.wait{background:rgba(245,158,11,.15);color:var(--warn)}
+  .st.bad{background:rgba(239,68,68,.15);color:var(--danger)}
+  .av-sm{width:22px;height:22px;border-radius:50%;background:var(--purple);color:#1a1030;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:7px;vertical-align:middle}
+
+  /* side lists */
+  .mitem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .mitem:last-child{border:none}
+  .mitem .ic{width:30px;height:30px;border-radius:8px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .mitem .t{flex:1;font-size:12px}
+  .mitem .t small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+  .mitem .tm{color:var(--dim2);font-size:10px;white-space:nowrap}
+
+  .progress{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:7px}
+  .progress i{display:block;height:100%;border-radius:4px}
+  .bars{display:flex;flex-direction:column;gap:11px;margin-top:4px}
+  .bars .row{font-size:12px}
+  .bars .row .top{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:4px}
+  .bars .row .top b{color:var(--txt)}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="mark">智</div>
+    <div><b>智慧校园</b><span>Campus OS · v3.2</span></div>
+  </div>
+  <nav class="nav">
+    <div class="grp">主控制台</div>
+    <a class="active" href="#"><span class="ic">📊</span>数据总览</a>
+    <a href="#"><span class="ic">✅</span>今日待办 <span class="badge">12</span></a>
+    <div class="grp">业务管理</div>
+    <a href="#"><span class="ic">🎓</span>学生管理</a>
+    <a href="#"><span class="ic">📚</span>教务管理</a>
+    <a href="#"><span class="ic">🏠</span>宿舍管理</a>
+    <a href="#"><span class="ic">💳</span>一卡通 / 消费</a>
+    <a href="#"><span class="ic">💰</span>财务缴费</a>
+    <a href="#"><span class="ic">⚙️</span>资产设备</a>
+    <div class="grp">协同</div>
+    <a href="#"><span class="ic">📢</span>通知公告 <span class="badge">3</span></a>
+    <a href="#"><span class="ic">🛡️</span>安全预警</a>
+    <a href="#"><span class="ic">⚙</span>系统设置</a>
+  </nav>
+  <div class="side-foot">
+    <div class="av">王</div>
+    <div><b>王管理员</b><small>信息化办公室</small></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb">主控制台 / <b>数据总览</b></div>
+    <div class="search"><input placeholder="搜索学号 / 姓名 / 工单号 / 设备…"></div>
+    <div class="top-ico">🔔<span class="dot"></span></div>
+    <div class="top-ico">✉️</div>
+    <div class="top-ico u">王</div>
+  </div>
+
+  <div class="content">
+    <div class="page-h">
+      <div>
+        <h1>校园数据总览</h1>
+        <p>2026 春季学期 · 数据更新于 07:32 · 全校 18 个院系 / 42 个专业</p>
+      </div>
+      <div class="seg">
+        <button>今日</button><button class="on">本学期</button><button>全年</button>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpis">
+      <div class="kpi"><div class="lab">🎓 在校生总数</div><div class="val">24,816</div><div class="sub up">▲ 1.8% 较上学期</div></div>
+      <div class="kpi"><div class="lab">✅ 今日考勤率</div><div class="val">96.4%</div><div class="sub up">▲ 0.6%</div></div>
+      <div class="kpi"><div class="lab">📝 待审批</div><div class="val">128</div><div class="sub down">▼ 23 待你处理</div></div>
+      <div class="kpi"><div class="lab">💰 本月缴费</div><div class="val">¥1.92M</div><div class="sub up">▲ 已缴 89%</div></div>
+      <div class="kpi"><div class="lab">🏠 宿舍入住</div><div class="val">93.1%</div><div class="sub">8 栋满员</div></div>
+      <div class="kpi"><div class="lab">⚠️ 安全预警</div><div class="val">5</div><div class="sub down">2 高危待核</div></div>
+    </div>
+
+    <!-- Row 1 -->
+    <div class="grid g-2">
+      <div class="card">
+        <h3>在校人数与考勤趋势 <span class="tag">近 12 周</span></h3>
+        <svg class="chart" viewBox="0 0 600 170" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4f8cff" stop-opacity=".35"/>
+              <stop offset="100%" stop-color="#4f8cff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- grid -->
+          <g stroke="#2a3140" stroke-width="1">
+            <line x1="0" y1="42" x2="600" y2="42"/><line x1="0" y1="84" x2="600" y2="84"/><line x1="0" y1="126" x2="600" y2="126"/>
+          </g>
+          <!-- area + line: 在校人数 -->
+          <path d="M0,120 L55,112 L110,118 L165,100 L220,104 L275,92 L330,86 L385,90 L440,78 L495,82 L550,70 L600,66 L600,170 L0,170 Z" fill="url(#g1)"/>
+          <path d="M0,120 L55,112 L110,118 L165,100 L220,104 L275,92 L330,86 L385,90 L440,78 L495,82 L550,70 L600,66" fill="none" stroke="#4f8cff" stroke-width="2.5"/>
+          <!-- 考勤率 line -->
+          <path d="M0,96 L55,90 L110,94 L165,84 L220,80 L275,74 L330,70 L385,66 L440,60 L495,58 L550,52 L600,48" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="5 4"/>
+          <g fill="#8b949e" font-size="9">
+            <text x="0" y="166">第1周</text><text x="270" y="166">第7周</text><text x="560" y="166">第12周</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#4f8cff"></i>在校人数（人）</span>
+          <span><i style="background:#22c55e"></i>周考勤率（%）</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>实时待办 <span class="more">全部 →</span></h3>
+        <div class="mitem"><div class="ic">📝</div><div class="t">奖学金申请材料复核<small>计算机学院 · 32 份待审</small></div><div class="tm">08:10</div></div>
+        <div class="mitem"><div class="ic">🏠</div><div class="t">3 号楼调宿申请<small>需后勤确认空床位</small></div><div class="tm">昨天</div></div>
+        <div class="mitem"><div class="ic">💳</div><div class="t">一卡通异常消费核查<small>单笔 ¥2,400 待确认</small></div><div class="tm">昨天</div></div>
+        <div class="mitem"><div class="ic">⚠️</div><div class="t">夜间未归预警处置<small>5 人 · 2 人高危</small></div><div class="tm">昨天</div></div>
+        <div class="mitem"><div class="ic">💰</div><div class="t">教材费欠缴催办<small>电气学院 · 47 人</small></div><div class="tm">08-03</div></div>
+        <div class="mitem"><div class="ic">⚙️</div><div class="t">实验室设备报修<small>物理实验中心 · 2 台</small></div><div class="tm">08-03</div></div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="grid g-3">
+      <div class="card">
+        <h3>各院系人数分布</h3>
+        <div class="bars">
+          <div class="row"><div class="top"><span>计算机学院</span><b>3,120</b></div><div class="progress"><i style="width:100%;background:#4f8cff"></i></div></div>
+          <div class="row"><div class="top"><span>经济管理学院</span><b>2,840</b></div><div class="progress"><i style="width:91%;background:#a78bfa"></i></div></div>
+          <div class="row"><div class="top"><span>机械工程</span><b>2,510</b></div><div class="progress"><i style="width:80%;background:#22c55e"></i></div></div>
+          <div class="row"><div class="top"><span>外国语学院</span><b>1,980</b></div><div class="progress"><i style="width:63%;background:#f59e0b"></i></div></div>
+          <div class="row"><div class="top"><span>医学院</span><b>1,760</b></div><div class="progress"><i style="width:56%;background:#ef4444"></i></div></div>
+          <div class="row"><div class="top"><span>艺术设计</span><b>1,430</b></div><div class="progress"><i style="width:46%;background:#4f8cff"></i></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>宿舍入住率 <span class="tag">42 栋</span></h3>
+        <svg class="chart" viewBox="0 0 200 170">
+          <g transform="translate(100,85)">
+            <circle r="62" fill="none" stroke="#1c2230" stroke-width="16"/>
+            <circle r="62" fill="none" stroke="#22c55e" stroke-width="16" stroke-dasharray="363" stroke-dashoffset="25" transform="rotate(-90)"/>
+            <text x="0" y="-4" text-anchor="middle" fill="#e6edf3" font-size="26" font-weight="700">93%</text>
+            <text x="0" y="16" text-anchor="middle" fill="#8b949e" font-size="10">总体入住</text>
+          </g>
+        </svg>
+        <div class="legend" style="justify-content:center">
+          <span><i style="background:#22c55e"></i>已住 21,840</span>
+          <span><i style="background:#1c2230"></i>空置 1,620</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>一卡通消费构成 <span class="tag">本周</span></h3>
+        <div class="bars">
+          <div class="row"><div class="top"><span>🍜 食堂餐饮</span><b>58%</b></div><div class="progress"><i style="width:58%;background:#4f8cff"></i></div></div>
+          <div class="row"><div class="top"><span>🛒 超市便利店</span><b>21%</b></div><div class="progress"><i style="width:21%;background:#a78bfa"></i></div></div>
+          <div class="row"><div class="top"><span>📖 图书打印</span><b>11%</b></div><div class="progress"><i style="width:11%;background:#22c55e"></i></div></div>
+          <div class="row"><div class="top"><span>🏊 体育场馆</span><b>7%</b></div><div class="progress"><i style="width:7%;background:#f59e0b"></i></div></div>
+          <div class="row"><div class="top"><span>其他</span><b>3%</b></div><div class="progress"><i style="width:3%;background:#ef4444"></i></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: tables -->
+    <div class="grid g-2" style="margin-top:14px">
+      <div class="card">
+        <h3>最新审批工单 <span class="more">审批中心 →</span></h3>
+        <table>
+          <thead><tr><th>工单</th><th>申请人</th><th>类型</th><th>状态</th><th>提交</th></tr></thead>
+          <tbody>
+            <tr><td>#WO-20481</td><td><span class="av-sm">李</span>李思源</td><td>请假 · 病假</td><td><span class="st wait">待审批</span></td><td>07:28</td></tr>
+            <tr><td>#WO-20480</td><td><span class="av-sm">张</span>张宇</td><td>调宿申请</td><td><span class="st ok">已通过</span></td><td>昨天</td></tr>
+            <tr><td>#WO-20479</td><td><span class="av-sm">王</span>王梓涵</td><td>奖助学金</td><td><span class="st wait">复核中</span></td><td>昨天</td></tr>
+            <tr><td>#WO-20478</td><td><span class="av-sm">陈</span>陈墨</td><td>设备报修</td><td><span class="st bad">已驳回</span></td><td>08-03</td></tr>
+            <tr><td>#WO-20477</td><td><span class="av-sm">赵</span>赵欣</td><td>活动场地</td><td><span class="st ok">已通过</span></td><td>08-03</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>安全预警 <span class="more">预警台 →</span></h3>
+        <table>
+          <thead><tr><th>事件</th><th>位置</th><th>等级</th></tr></thead>
+          <tbody>
+            <tr><td>夜间未归 · 连续 2 天</td><td>3 号楼 512</td><td><span class="st bad">高危</span></td></tr>
+            <tr><td>一卡通异常大额消费</td><td>中心食堂</td><td><span class="st bad">高危</span></td></tr>
+            <tr><td>实验室门禁异常开启</td><td>实训楼 B2</td><td><span class="st wait">中</span></td></tr>
+            <tr><td>宿舍用电超负荷</td><td>7 号楼 208</td><td><span class="st wait">中</span></td></tr>
+            <tr><td>图书馆占座超时</td><td>阅览室 3</td><td><span class="st ok">低</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Row 4: 通知 -->
+    <div class="grid g-2" style="margin-top:14px">
+      <div class="card">
+        <h3>通知公告 <span class="more">发布管理 →</span></h3>
+        <div class="mitem"><div class="ic">📢</div><div class="t">关于做好 2026 年秋季迎新的通知<small>信息化办 · 已读 18,420 / 24,816</small></div><div class="tm">08-04</div></div>
+        <div class="mitem"><div class="ic">📅</div><div class="t">本学期选课补退选时间安排<small>教务处 · 置顶</small></div><div class="tm">08-03</div></div>
+        <div class="mitem"><div class="ic">💡</div><div class="t">宿舍空调集中检修计划<small>后勤集团</small></div><div class="tm">08-02</div></div>
+        <div class="mitem"><div class="ic">🛡️</div><div class="t">防诈骗宣传月活动启动<small>保卫处 · 必读</small></div><div class="tm">08-01</div></div>
+      </div>
+      <div class="card">
+        <h3>系统运行状态 <span class="tag">SLA 99.95%</span></h3>
+        <div class="bars">
+          <div class="row"><div class="top"><span>统一身份认证</span><b>正常</b></div><div class="progress"><i style="width:99%;background:#22c55e"></i></div></div>
+          <div class="row"><div class="top"><span>教务系统</span><b>正常</b></div><div class="progress"><i style="width:98%;background:#22c55e"></i></div></div>
+          <div class="row"><div class="top"><span>一卡通平台</span><b>正常</b></div><div class="progress"><i style="width:97%;background:#22c55e"></i></div></div>
+          <div class="row"><div class="top"><span>财务缴费</span><b>延迟 12ms</b></div><div class="progress"><i style="width:82%;background:#f59e0b"></i></div></div>
+          <div class="row"><div class="top"><span>视频监控</span><b>2 路离线</b></div><div class="progress"><i style="width:70%;background:#ef4444"></i></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</body>
+</html>
